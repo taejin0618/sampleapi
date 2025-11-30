@@ -102,7 +102,7 @@ router.get("/:id", (req, res) => {
  *                 example: "게시글 내용입니다."
  *               writer:
  *                 type: string
- *                 description: 작성자 이름 (선택 사항, 기본값: 익명)
+ *                 description: "작성자 이름 (선택 사항, 기본값: 익명)"
  *                 example: "홍길동"
  *               tags:
  *                 type: array
@@ -114,16 +114,16 @@ router.get("/:id", (req, res) => {
  *                 type: integer
  *                 minimum: 1
  *                 maximum: 10
- *                 description: 우선순위 (1-10, 선택 사항, 기본값: 5)
+ *                 description: "우선순위 (1-10, 선택 사항, 기본값: 5)"
  *                 example: 5
  *               isPinned:
  *                 type: boolean
- *                 description: 고정 여부 (선택 사항, 기본값: false)
+ *                 description: "고정 여부 (선택 사항, 기본값: false)"
  *                 example: false
  *               status:
  *                 type: string
  *                 enum: [active, inactive, deleted]
- *                 description: 게시글 상태 (선택 사항, 기본값: active)
+ *                 description: "게시글 상태 (선택 사항, 기본값: active)"
  *                 example: "active"
  *     responses:
  *       201:
@@ -315,7 +315,7 @@ router.put("/:id", (req, res) => {
  *               status:
  *                 type: string
  *                 enum: [active, inactive, deleted]
- *                 description: 변경할 상태 (active: 활성, inactive: 비활성, deleted: 삭제됨)
+ *                 description: "변경할 상태 (active: 활성, inactive: 비활성, deleted: 삭제됨)"
  *                 example: "active"
  *     responses:
  *       200:
