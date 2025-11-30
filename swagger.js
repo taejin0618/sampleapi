@@ -10,10 +10,12 @@ const options = {
     },
     servers: [
       {
-        url: process.env.VERCEL_URL
-          ? `https://${process.env.VERCEL_URL}`
+        url: process.env.RENDER_EXTERNAL_URL
+          ? process.env.RENDER_EXTERNAL_URL
           : 'http://localhost:3001',
-        description: process.env.VERCEL_URL ? '프로덕션 서버' : '개발 서버',
+        description: process.env.RENDER_EXTERNAL_URL
+          ? '프로덕션 서버'
+          : '개발 서버',
       },
     ],
     components: {

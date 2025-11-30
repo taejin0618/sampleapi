@@ -13,35 +13,39 @@ app.use(express.urlencoded({ extended: true }));
 // OpenAPI 스펙 JSON 제공
 app.get("/api-docs.json", (req, res) => {
   res.setHeader("Content-Type", "application/json");
+  res.setHeader("Access-Control-Allow-Origin", "*");
   res.send(swaggerSpec);
 });
 
 // Swagger UI 설정
-app.use(
-  "/api-docs",
-  swaggerUi.serve,
-  swaggerUi.setup(swaggerSpec, {
-    customCss: ".swagger-ui .topbar { display: none }",
-    customSiteTitle: "게시판 API 문서",
-  })
-);
+const swaggerUiOptions = {
+  customCss: ".swagger-ui .topbar { display: none }",
+  customSiteTitle: "게시판 API 문서",
+  swaggerOptions: {
+    persistAuthorization: true,
+    displayRequestDuration: true,
+  },
+};
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, swaggerUiOptions));
 
 // API 라우트
 app.use("/v3/api/posts", postsRouter);
 
 // 루트 경로
 app.get("/", (req, res) => {
+  // 동적으로 기본 URL 생성
+  const protocol = req.protocol || (req.headers['x-forwarded-proto'] || 'http').split(',')[0];
+  const host = req.get('host') || `localhost:${PORT}`;
+  const baseUrl = process.env.RENDER_EXTERNAL_URL || `${protocol}://${host}`;
+
   res.json({
     message: "API 서버가 실행 중입니다.",
     endpoints: {
       posts: "/v3/api/posts",
     },
-    docs: process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}/api-docs`
-      : "http://localhost:3001/api-docs",
-    spec: process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}/api-docs.json`
-      : "http://localhost:3001/api-docs.json",
+    docs: `${baseUrl}/api-docs`,
+    spec: `${baseUrl}/api-docs.json`,
   });
 });
 
