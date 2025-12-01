@@ -42,9 +42,20 @@ function updatePost(id, subject, body, writer) {
   return post;
 }
 
+// 게시글 삭제
+function deletePost(id) {
+  const index = posts.findIndex((post) => post.id === parseInt(id));
+  if (index === -1) {
+    return false;
+  }
+  posts.splice(index, 1);
+  return true;
+}
+
 module.exports = {
   getAllPosts,
   getPostById,
   createPost,
   updatePost,
+  deletePost,
 };
