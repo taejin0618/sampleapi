@@ -1,6 +1,7 @@
 const express = require("express");
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./swagger");
+const postsRouter = require("./routes/posts");
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -28,6 +29,9 @@ const swaggerUiOptions = {
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, swaggerUiOptions));
 
+// API 라우트
+app.use("/v1/api/posts", postsRouter);
+
 // 루트 경로
 app.get("/", (req, res) => {
   // 동적으로 기본 URL 생성
@@ -37,6 +41,9 @@ app.get("/", (req, res) => {
 
   res.json({
     message: "API 서버가 실행 중입니다.",
+    endpoints: {
+      posts: "/v1/api/posts",
+    },
     docs: `${baseUrl}/api-docs`,
     spec: `${baseUrl}/api-docs.json`,
   });
