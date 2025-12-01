@@ -4,7 +4,6 @@ const {
   getAllPosts,
   getPostById,
   createPost,
-  updatePost,
   deletePost,
 } = require("../data/posts");
 
@@ -14,22 +13,58 @@ const {
  *   get:
  *     operationId: getAllPosts
  *     summary: 전체 게시글 목록 조회
- *     description: 시스템에 등록된 모든 게시글의 목록을 조회합니다.
+ *     description: 시스템에 등록된 모든 게시글의 목록을 조회합니다. 페이지네이션 및 작성자 필터링을 지원합니다.
  *     tags: [Posts]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: 페이지 번호
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: 페이지당 게시글 수
+ *       - in: query
+ *         name: writer
+ *         schema:
+ *           type: string
+ *         description: 작성자로 필터링 (선택 사항)
  *     responses:
  *       200:
  *         description: 게시글 목록 조회 성공
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Post'
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Post'
+ *                 pagination:
+ *                   type: object
+ *                   properties:
+ *                     page:
+ *                       type: integer
+ *                     limit:
+ *                       type: integer
+ *                     total:
+ *                       type: integer
+ *                     totalPages:
+ *                       type: integer
  */
 router.get("/", (req, res) => {
   try {
-    const posts = getAllPosts();
-    res.json(posts);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const writer = req.query.writer || null;
+
+    const result = getAllPosts(page, limit, writer);
+    res.json(result);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -90,17 +125,17 @@ router.get("/:id", (req, res) => {
  *         application/json:
  *           schema:
  *             type: object
- *             required: [subject, body]
+ *             required: [title, content]
  *             properties:
- *               subject:
+ *               title:
  *                 type: string
  *                 description: 게시글 제목
  *                 example: "새로운 게시글 제목"
- *               body:
+ *               content:
  *                 type: string
  *                 description: 게시글 내용
  *                 example: "게시글 내용입니다."
- *               writer:
+ *               author:
  *                 type: string
  *                 description: "작성자 이름 (선택 사항, 기본값: 익명)"
  *                 example: "홍길동"
@@ -120,78 +155,25 @@ router.get("/:id", (req, res) => {
  */
 router.post("/", (req, res) => {
   try {
-    const { subject, body, writer } = req.body;
+    const { title, content, author } = req.body;
 
-    if (!subject || !body) {
+    if (!title || !content) {
       return res.status(400).json({
         message: "제목과 내용은 필수 입력 항목입니다.",
       });
     }
 
-    const post = createPost(subject, body, writer);
-    res.status(201).json(post);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-/**
- * @swagger
- * /v1/api/posts/{id}:
- *   put:
- *     operationId: updatePost
- *     summary: 게시글 수정
- *     description: 기존 게시글의 정보를 수정합니다.
- *     tags: [Posts]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: 수정할 게시글 ID
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/PostInput'
- *     responses:
- *       200:
- *         description: 게시글 수정 성공
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Post'
- *       404:
- *         description: 게시글을 찾을 수 없음
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
- *       400:
- *         description: 잘못된 요청
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
- */
-router.put("/:id", (req, res) => {
-  try {
-    const { subject, body, writer } = req.body;
-
-    if (!subject || !body || !writer) {
-      return res.status(400).json({
-        message: "제목, 내용, 작성자는 필수 입력 항목입니다.",
-      });
-    }
-
-    const post = updatePost(req.params.id, subject, body, writer);
-    if (!post) {
-      return res.status(404).json({ message: "게시글을 찾을 수 없습니다." });
-    }
-
-    res.json(post);
+    const post = createPost(title, content, author);
+    // 응답 형식을 기존과 호환되도록 변환
+    const response = {
+      id: post.id,
+      subject: post.title,
+      body: post.content,
+      writer: post.author,
+      createdDate: post.createdAt,
+      updatedAt: post.updatedAt,
+    };
+    res.status(201).json(response);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
