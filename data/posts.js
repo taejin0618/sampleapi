@@ -69,6 +69,21 @@ function createPost(title, content, author = "익명") {
   return post;
 }
 
+// 게시글 수정
+function updatePost(id, title, content, author) {
+  const post = posts.find((post) => post.id === parseInt(id));
+  if (!post) {
+    return null;
+  }
+
+  if (title !== undefined) post.title = title;
+  if (content !== undefined) post.content = content;
+  if (author !== undefined) post.author = author;
+  post.updatedAt = new Date().toISOString();
+
+  return post;
+}
+
 // 게시글 삭제
 function deletePost(id) {
   const index = posts.findIndex((post) => post.id === parseInt(id));
@@ -83,5 +98,6 @@ module.exports = {
   getAllPosts,
   getPostById,
   createPost,
+  updatePost,
   deletePost,
 };

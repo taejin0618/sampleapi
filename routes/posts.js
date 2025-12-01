@@ -4,12 +4,13 @@ const {
   getAllPosts,
   getPostById,
   createPost,
+  updatePost,
   deletePost,
 } = require("../data/posts");
 
 /**
  * @swagger
- * /v1/api/posts:
+ * /v2/api/posts:
  *   get:
  *     operationId: getAllPosts
  *     summary: 전체 게시글 목록 조회
@@ -72,7 +73,7 @@ router.get("/", (req, res) => {
 
 /**
  * @swagger
- * /v1/api/posts/{id}:
+ * /v2/api/posts/{id}:
  *   get:
  *     operationId: getPostById
  *     summary: 특정 게시글 조회
@@ -113,7 +114,7 @@ router.get("/:id", (req, res) => {
 
 /**
  * @swagger
- * /v1/api/posts:
+ * /v2/api/posts:
  *   post:
  *     operationId: createPost
  *     summary: 게시글 생성
@@ -181,7 +182,93 @@ router.post("/", (req, res) => {
 
 /**
  * @swagger
- * /v1/api/posts/{id}:
+ * /v2/api/posts/{id}:
+ *   put:
+ *     operationId: updatePost
+ *     summary: 게시글 수정
+ *     description: 기존 게시글의 정보를 수정합니다.
+ *     tags: [Posts]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: 수정할 게시글 ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [title, content, author]
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 description: 게시글 제목
+ *                 example: "수정된 게시글 제목"
+ *               content:
+ *                 type: string
+ *                 description: 게시글 내용
+ *                 example: "수정된 게시글 내용입니다."
+ *               author:
+ *                 type: string
+ *                 description: 작성자 이름
+ *                 example: "홍길동"
+ *     responses:
+ *       200:
+ *         description: 게시글 수정 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Post'
+ *       404:
+ *         description: 게시글을 찾을 수 없음
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       400:
+ *         description: 잘못된 요청
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+router.put("/:id", (req, res) => {
+  try {
+    const { title, content, author } = req.body;
+
+    if (!title || !content || !author) {
+      return res.status(400).json({
+        message: "제목, 내용, 작성자는 필수 입력 항목입니다.",
+      });
+    }
+
+    const post = updatePost(req.params.id, title, content, author);
+    if (!post) {
+      return res.status(404).json({ message: "게시글을 찾을 수 없습니다." });
+    }
+
+    // 응답 형식을 기존과 호환되도록 변환
+    const response = {
+      id: post.id,
+      subject: post.title,
+      body: post.content,
+      writer: post.author,
+      createdDate: post.createdAt,
+      updatedAt: post.updatedAt,
+    };
+
+    res.json(response);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+/**
+ * @swagger
+ * /v2/api/posts/{id}:
  *   delete:
  *     operationId: deletePost
  *     summary: 게시글 삭제
