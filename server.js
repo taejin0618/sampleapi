@@ -34,7 +34,7 @@ app.use(
 );
 
 // API 라우트
-app.use("/v2/api/posts", postsRouter);
+app.use("/v1/api/posts", postsRouter);
 
 // 루트 경로
 app.get("/", (req, res) => {
@@ -47,7 +47,7 @@ app.get("/", (req, res) => {
   res.json({
     message: "API 서버가 실행 중입니다.",
     endpoints: {
-      posts: "/v2/api/posts",
+      posts: "/v1/api/posts",
     },
     docs: `${baseUrl}/api-docs`,
     spec: `${baseUrl}/api-docs.json`,
