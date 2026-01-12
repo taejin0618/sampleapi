@@ -27,7 +27,11 @@ const swaggerUiOptions = {
   },
 };
 
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, swaggerUiOptions));
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec, swaggerUiOptions)
+);
 
 // API 라우트
 app.use("/v2/api/posts", postsRouter);
@@ -35,8 +39,9 @@ app.use("/v2/api/posts", postsRouter);
 // 루트 경로
 app.get("/", (req, res) => {
   // 동적으로 기본 URL 생성
-  const protocol = req.protocol || (req.headers['x-forwarded-proto'] || 'http').split(',')[0];
-  const host = req.get('host') || `localhost:${PORT}`;
+  const protocol =
+    req.protocol || (req.headers["x-forwarded-proto"] || "http").split(",")[0];
+  const host = req.get("host") || `localhost:${PORT}`;
   const baseUrl = process.env.RENDER_EXTERNAL_URL || `${protocol}://${host}`;
 
   res.json({
