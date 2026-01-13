@@ -10,7 +10,7 @@ const {
 
 /**
  * @swagger
- * /v1/api/posts:
+ * /v2/api/posts:
  *   get:
  *     operationId: getAllPosts
  *     summary: 전체 게시글 목록 조회
@@ -73,7 +73,7 @@ router.get("/", (req, res) => {
 
 /**
  * @swagger
- * /v1/api/posts/{id}:
+ * /v2/api/posts/{id}:
  *   get:
  *     operationId: getPostById
  *     summary: 특정 게시글 조회
@@ -114,7 +114,7 @@ router.get("/:id", (req, res) => {
 
 /**
  * @swagger
- * /v1/api/posts:
+ * /v2/api/posts:
  *   post:
  *     operationId: createPost
  *     summary: 게시글 생성
@@ -182,7 +182,7 @@ router.post("/", (req, res) => {
 
 /**
  * @swagger
- * /v1/api/posts/{id}:
+ * /v2/api/posts/{id}:
  *   put:
  *     operationId: updatePost
  *     summary: 게시글 수정
@@ -268,7 +268,7 @@ router.put("/:id", (req, res) => {
 
 /**
  * @swagger
- * /v1/api/posts/{id}:
+ * /v2/api/posts/{id}:
  *   delete:
  *     operationId: deletePost
  *     summary: 게시글 삭제
