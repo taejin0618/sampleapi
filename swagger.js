@@ -5,8 +5,8 @@ const options = {
     openapi: "3.0.0",
     info: {
       title: "게시판 API",
-      version: "3.0.0",
-      description: "게시판 CRUD API (v3 - Breaking Changes: 필드명 통일, isPublic 필터링)",
+      version: "4.0.0",
+      description: "게시판 CRUD API (v4 - 샘플 데이터 포함)",
     },
     servers: [
       {
@@ -99,6 +99,39 @@ const options = {
               description: "공개 여부",
               example: true,
               default: true,
+            },
+          },
+        },
+        Test: {
+          type: "object",
+          required: ["name", "value"],
+          properties: {
+            id: {
+              type: "integer",
+              description: "항목 고유 ID",
+              example: 1,
+            },
+            name: {
+              type: "string",
+              description: "테스트명",
+              example: "API 연결 테스트",
+            },
+            value: {
+              type: "string",
+              description: "테스트값",
+              example: "성공",
+            },
+            createdAt: {
+              type: "string",
+              format: "date-time",
+              description: "작성일시",
+              example: "2024-01-01T00:00:00.000Z",
+            },
+            updatedAt: {
+              type: "string",
+              format: "date-time",
+              description: "수정일시",
+              example: "2024-01-01T00:00:00.000Z",
             },
           },
         },

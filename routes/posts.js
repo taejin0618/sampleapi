@@ -10,7 +10,7 @@ const {
 
 /**
  * @swagger
- * /v3/api/posts:
+ * /v4/api/posts:
  *   get:
  *     operationId: getAllPosts
  *     summary: 전체 게시글 목록 조회
@@ -74,7 +74,7 @@ router.get("/", (req, res) => {
 
 /**
  * @swagger
- * /v3/api/posts/{id}:
+ * /v4/api/posts/{id}:
  *   get:
  *     operationId: getPostById
  *     summary: 특정 게시글 조회
@@ -115,7 +115,7 @@ router.get("/:id", (req, res) => {
 
 /**
  * @swagger
- * /v3/api/posts:
+ * /v4/api/posts:
  *   post:
  *     operationId: createPost
  *     summary: 게시글 생성
@@ -150,26 +150,13 @@ router.get("/:id", (req, res) => {
  *                 description: 공개 여부 (기본값 true)
  *                 example: true
  *           examples:
- *             case1:
- *               summary: "필수 필드만"
+ *             example1:
+ *               summary: "게시글 생성"
  *               value:
- *                 title: "첫 게시글"
- *                 content: "내용"
+ *                 title: "새로운 게시글"
+ *                 content: "게시글 내용입니다."
  *                 author: "홍길동"
- *             case2:
- *               summary: "모든 필드"
- *               value:
- *                 title: "공개 게시글"
- *                 content: "모두 공개"
- *                 author: "김철수"
  *                 isPublic: true
- *             case3:
- *               summary: "비공개 게시글"
- *               value:
- *                 title: "비공개"
- *                 content: "목록에 안보임"
- *                 author: "이영희"
- *                 isPublic: false
  *     responses:
  *       201:
  *         description: 게시글 생성 성공
@@ -203,7 +190,7 @@ router.post("/", (req, res) => {
 
 /**
  * @swagger
- * /v3/api/posts/{id}:
+ * /v4/api/posts/{id}:
  *   put:
  *     operationId: updatePost
  *     summary: 게시글 수정
@@ -240,6 +227,14 @@ router.post("/", (req, res) => {
  *                 type: boolean
  *                 description: 공개 여부
  *                 example: true
+ *           examples:
+ *             example1:
+ *               summary: "게시글 수정"
+ *               value:
+ *                 title: "수정된 제목"
+ *                 content: "수정된 내용입니다."
+ *                 author: "홍길동"
+ *                 isPublic: true
  *     responses:
  *       200:
  *         description: 게시글 수정 성공
@@ -283,7 +278,7 @@ router.put("/:id", (req, res) => {
 
 /**
  * @swagger
- * /v3/api/posts/{id}:
+ * /v4/api/posts/{id}:
  *   delete:
  *     operationId: deletePost
  *     summary: 게시글 삭제
