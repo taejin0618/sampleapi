@@ -3,21 +3,13 @@ let tests = [];
 let nextId = 1;
 
 // 전체 테스트 항목 조회
-function getAllTests(page = 1, limit = 10) {
+function getAllTests(page = 1) {
   // 페이지네이션
   const startIndex = (page - 1) * limit;
-  const endIndex = startIndex + limit;
+  const endIndex = startIndex + 10;
   const paginatedTests = tests.slice(startIndex, endIndex);
 
-  return {
-    data: paginatedTests,
-    pagination: {
-      page,
-      limit,
-      total: tests.length,
-      totalPages: Math.ceil(tests.length / limit),
-    },
-  };
+  return paginatedTests;
 }
 
 // ID로 테스트 항목 조회

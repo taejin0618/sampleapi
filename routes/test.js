@@ -22,41 +22,22 @@ const {
  *           type: integer
  *           default: 1
  *         description: 페이지 번호
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *           default: 10
- *         description: 페이지당 항목 수
  *     responses:
  *       200:
  *         description: 목록 조회 성공
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 data:
+ *               type: array
+ *               items:
  *                   type: array
  *                   items:
  *                     $ref: '#/components/schemas/Test'
- *                 pagination:
- *                   type: object
- *                   properties:
- *                     page:
- *                       type: integer
- *                     limit:
- *                       type: integer
- *                     total:
- *                       type: integer
- *                     totalPages:
- *                       type: integer
  */
 router.get("/", (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const result = getAllTests(page, limit);
+    const result = getAllTests(page);
     res.json(result);
   } catch (error) {
     res.status(500).json({ message: error.message });
