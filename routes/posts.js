@@ -10,7 +10,7 @@ const {
 
 /**
  * @swagger
- * /v2/api/posts:
+ * /v3/api/posts:
  *   get:
  *     operationId: getAllPosts
  *     summary: 전체 게시글 목록 조회
@@ -63,8 +63,9 @@ router.get("/", (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const writer = req.query.writer || null;
+    const includePrivate = false;
 
-    const result = getAllPosts(page, limit, writer);
+    const result = getAllPosts(page, limit, writer, includePrivate);
     res.json(result);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -73,7 +74,7 @@ router.get("/", (req, res) => {
 
 /**
  * @swagger
- * /v2/api/posts/{id}:
+ * /v3/api/posts/{id}:
  *   get:
  *     operationId: getPostById
  *     summary: 특정 게시글 조회
@@ -114,7 +115,7 @@ router.get("/:id", (req, res) => {
 
 /**
  * @swagger
- * /v2/api/posts:
+ * /v3/api/posts:
  *   post:
  *     operationId: createPost
  *     summary: 게시글 생성
@@ -126,7 +127,7 @@ router.get("/:id", (req, res) => {
  *         application/json:
  *           schema:
  *             type: object
- *             required: [title, content]
+ *             required: [title, content, author]
  *             properties:
  *               title:
  *                 type: string
@@ -138,8 +139,37 @@ router.get("/:id", (req, res) => {
  *                 example: "게시글 내용입니다."
  *               author:
  *                 type: string
- *                 description: "작성자 이름 (선택 사항, 기본값: 익명)"
+ *                 description: 작성자 이름 (필수)
  *                 example: "홍길동"
+ *               viewCount:
+ *                 type: integer
+ *                 description: 조회수 (무시됨, 서버에서 항상 0으로 초기화)
+ *                 example: 0
+ *               isPublic:
+ *                 type: boolean
+ *                 description: 공개 여부 (기본값 true)
+ *                 example: true
+ *           examples:
+ *             case1:
+ *               summary: "필수 필드만"
+ *               value:
+ *                 title: "첫 게시글"
+ *                 content: "내용"
+ *                 author: "홍길동"
+ *             case2:
+ *               summary: "모든 필드"
+ *               value:
+ *                 title: "공개 게시글"
+ *                 content: "모두 공개"
+ *                 author: "김철수"
+ *                 isPublic: true
+ *             case3:
+ *               summary: "비공개 게시글"
+ *               value:
+ *                 title: "비공개"
+ *                 content: "목록에 안보임"
+ *                 author: "이영희"
+ *                 isPublic: false
  *     responses:
  *       201:
  *         description: 게시글 생성 성공
@@ -156,25 +186,16 @@ router.get("/:id", (req, res) => {
  */
 router.post("/", (req, res) => {
   try {
-    const { title, content, author } = req.body;
+    const { title, content, author, isPublic } = req.body;
 
-    if (!title || !content) {
+    if (!title || !content || !author) {
       return res.status(400).json({
-        message: "제목과 내용은 필수 입력 항목입니다.",
+        message: "제목, 내용, 작성자는 필수 입력 항목입니다.",
       });
     }
 
-    const post = createPost(title, content, author);
-    // 응답 형식을 기존과 호환되도록 변환
-    const response = {
-      id: post.id,
-      subject: post.title,
-      body: post.content,
-      writer: post.author,
-      createdDate: post.createdAt,
-      updatedAt: post.updatedAt,
-    };
-    res.status(201).json(response);
+    const post = createPost(title, content, author, isPublic);
+    res.status(201).json(post);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -182,7 +203,7 @@ router.post("/", (req, res) => {
 
 /**
  * @swagger
- * /v2/api/posts/{id}:
+ * /v3/api/posts/{id}:
  *   put:
  *     operationId: updatePost
  *     summary: 게시글 수정
@@ -215,6 +236,10 @@ router.post("/", (req, res) => {
  *                 type: string
  *                 description: 작성자 이름
  *                 example: "홍길동"
+ *               isPublic:
+ *                 type: boolean
+ *                 description: 공개 여부
+ *                 example: true
  *     responses:
  *       200:
  *         description: 게시글 수정 성공
@@ -237,7 +262,7 @@ router.post("/", (req, res) => {
  */
 router.put("/:id", (req, res) => {
   try {
-    const { title, content, author } = req.body;
+    const { title, content, author, isPublic } = req.body;
 
     if (!title || !content || !author) {
       return res.status(400).json({
@@ -245,22 +270,12 @@ router.put("/:id", (req, res) => {
       });
     }
 
-    const post = updatePost(req.params.id, title, content, author);
+    const post = updatePost(req.params.id, title, content, author, isPublic);
     if (!post) {
       return res.status(404).json({ message: "게시글을 찾을 수 없습니다." });
     }
 
-    // 응답 형식을 기존과 호환되도록 변환
-    const response = {
-      id: post.id,
-      subject: post.title,
-      body: post.content,
-      writer: post.author,
-      createdDate: post.createdAt,
-      updatedAt: post.updatedAt,
-    };
-
-    res.json(response);
+    res.json(post);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -268,7 +283,7 @@ router.put("/:id", (req, res) => {
 
 /**
  * @swagger
- * /v2/api/posts/{id}:
+ * /v3/api/posts/{id}:
  *   delete:
  *     operationId: deletePost
  *     summary: 게시글 삭제

@@ -5,8 +5,8 @@ const options = {
     openapi: "3.0.0",
     info: {
       title: "게시판 API",
-      version: "1.0.0",
-      description: "게시판 CRUD API 문서",
+      version: "3.0.0",
+      description: "게시판 CRUD API (v3 - Breaking Changes: 필드명 통일, isPublic 필터링)",
     },
     servers: [
       {
@@ -22,29 +22,41 @@ const options = {
       schemas: {
         Post: {
           type: "object",
-          required: ["subject", "body", "writer"],
+          required: ["title", "content", "author"],
           properties: {
             id: {
               type: "integer",
               description: "게시글 고유 ID",
               example: 1,
             },
-            subject: {
+            title: {
               type: "string",
               description: "게시글 제목",
               example: "첫 번째 게시글",
             },
-            body: {
+            content: {
               type: "string",
               description: "게시글 내용",
               example: "이것은 첫 번째 게시글의 내용입니다.",
             },
-            writer: {
+            author: {
               type: "string",
               description: "작성자",
               example: "홍길동",
             },
-            createdDate: {
+            viewCount: {
+              type: "integer",
+              description: "조회수",
+              example: 0,
+              default: 0,
+            },
+            isPublic: {
+              type: "boolean",
+              description: "공개 여부 (false면 목록에서 제외)",
+              example: true,
+              default: true,
+            },
+            createdAt: {
               type: "string",
               format: "date-time",
               description: "작성일시",
@@ -60,22 +72,33 @@ const options = {
         },
         PostInput: {
           type: "object",
-          required: ["subject", "body", "writer"],
+          required: ["title", "content", "author"],
           properties: {
-            subject: {
+            title: {
               type: "string",
               description: "게시글 제목",
               example: "첫 번째 게시글",
             },
-            body: {
+            content: {
               type: "string",
               description: "게시글 내용",
               example: "이것은 첫 번째 게시글의 내용입니다.",
             },
-            writer: {
+            author: {
               type: "string",
               description: "작성자",
               example: "홍길동",
+            },
+            viewCount: {
+              type: "integer",
+              description: "조회수 (무시됨, 서버에서 항상 0으로 초기화)",
+              example: 0,
+            },
+            isPublic: {
+              type: "boolean",
+              description: "공개 여부",
+              example: true,
+              default: true,
             },
           },
         },
